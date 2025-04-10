@@ -1,0 +1,24 @@
+class Solution {
+    public int longestSubstring(String s, int k) {
+        if(s.length()==0 || k>s.length()){
+            return 0;
+        }
+        if(k==1){
+            return s.length();
+        }
+        HashMap<Character,Integer> freq= new HashMap<>();
+        for(char ch:s.toCharArray()){
+            freq.put(ch, freq.getOrDefault(ch,0)+1);
+        }
+        for(char ch: s.toCharArray()){
+            int maxlen=0;
+            if(freq.get(ch)<k){
+                for(String part: s.split(String.valueOf(ch))){
+                    maxlen=Math.max(maxlen,longestSubstring(part,k));
+                }
+                return maxlen;
+            }
+        }
+        return s.length();
+    }
+}
