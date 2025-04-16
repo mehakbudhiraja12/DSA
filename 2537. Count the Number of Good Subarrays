@@ -1,0 +1,32 @@
+import java.util.*;
+
+public class Solution {
+    public long countGood(int[] nums, int k) {
+        Map<Integer, Integer> freq = new HashMap<>();
+        long ans = 0;
+        long pairs = 0;
+        int left = 0;
+
+        for (int right = 0; right < nums.length; right++) {
+            int num = nums[right];
+            int count = freq.getOrDefault(num, 0);
+            
+            // Each new occurrence of num adds `count` new pairs
+            pairs += count;
+            freq.put(num, count + 1);
+
+            // Move left pointer until pairs >= k
+            while (pairs >= k) {
+                ans += nums.length - right; // all subarrays [left...right], [left...right+1], ... are good
+                int leftNum = nums[left];
+                int leftCount = freq.get(leftNum);
+                freq.put(leftNum, leftCount - 1);
+                pairs -= (leftCount - 1); // removing leftNum subtracts (f-1) pairs
+                left++;
+            }
+        }
+
+        return ans;
+    }
+    
+}
