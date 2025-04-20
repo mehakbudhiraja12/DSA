@@ -1,0 +1,21 @@
+import java.util.*;
+
+public class Solution {
+    public int numRabbits(int[] answers) {
+        Map<Integer, Integer> map = new HashMap<>();
+        int totalRabbits = 0;
+
+        for (int answer : answers) {
+            map.put(answer, map.getOrDefault(answer, 0) + 1);
+        }
+
+        for (int x : map.keySet()) {
+            int count = map.get(x);
+            int groupSize = x + 1;
+            int numberOfGroups = (int) Math.ceil((double) count / groupSize);
+            totalRabbits += numberOfGroups * groupSize;
+        }
+
+        return totalRabbits;
+    }
+}
