@@ -1,0 +1,69 @@
+import java.util.*;
+
+public class Solution {
+    static final int MOD = 1_000_000_007;
+    static final int MAX = 10010;
+    static long[] factorial = new long[MAX];
+    static long[] invFactorial = new long[MAX];
+
+    public int idealArrays(int n, int maxValue) {
+        // Precompute factorials and inverse factorials
+        precomputeFactorials(n);
+
+        // dp[k] = number of sequences of length k starting from 1
+        Map<Integer, Integer>[] dp = new HashMap[15]; // depth up to 14 is enough (log2(maxValue) < 14 for maxValue <= 10^4)
+        for (int i = 0; i < dp.length; i++) dp[i] = new HashMap<>();
+
+        for (int i = 1; i <= maxValue; i++) {
+            dfs(i, 1, maxValue, dp);
+        }
+
+        long res = 0;
+        for (int len = 1; len < dp.length; len++) {
+            for (int count : dp[len].values()) {
+                res = (res + count * comb(n - 1, len - 1)) % MOD;
+            }
+        }
+        return (int) res;
+    }
+
+    void dfs(int curr, int len, int maxValue, Map<Integer, Integer>[] dp) {
+        dp[len].put(curr, dp[len].getOrDefault(curr, 0) + 1);
+        if (len + 1 < dp.length) {
+            for (int next = curr * 2; next <= maxValue; next += curr) {
+                dfs(next, len + 1, maxValue, dp);
+            }
+        }
+    }
+
+    void precomputeFactorials(int n) {
+        factorial[0] = invFactorial[0] = 1;
+        for (int i = 1; i < MAX; i++) {
+            factorial[i] = factorial[i - 1] * i % MOD;
+        }
+        invFactorial[MAX - 1] = modInverse(factorial[MAX - 1]);
+        for (int i = MAX - 2; i >= 1; i--) {
+            invFactorial[i] = invFactorial[i + 1] * (i + 1) % MOD;
+        }
+    }
+
+    long comb(int n, int k) {
+        if (k < 0 || k > n) return 0;
+        return factorial[n] * invFactorial[k] % MOD * invFactorial[n - k] % MOD;
+    }
+
+    long modInverse(long a) {
+        return pow(a, MOD - 2);
+    }
+
+    long pow(long a, long b) {
+        long res = 1;
+        while (b > 0) {
+            if ((b & 1) == 1) res = res * a % MOD;
+            a = a * a % MOD;
+            b >>= 1;
+        }
+        return res;
+    }
+
+}
