@@ -1,0 +1,69 @@
+import java.util.*;
+
+public class Solution {
+    
+    public List<String> longestSubsequence(String[] words, int[] groups) {
+        int n = words.length;
+
+        // Step 1: Build graph
+        List<List<Integer>> graph = new ArrayList<>();
+        for (int i = 0; i < n; ++i) graph.add(new ArrayList<>());
+
+        for (int i = 0; i < n; ++i) {
+            for (int j = 0; j < n; ++j) {
+                if (i == j) continue;
+                if (groups[i] != groups[j] && 
+                    words[i].length() == words[j].length() && 
+                    hammingDistance(words[i], words[j]) == 1) {
+                    graph.get(i).add(j);
+                }
+            }
+        }
+
+        // Step 2: DFS + Memoization for longest path
+        int[] dp = new int[n];        // Longest path length starting at i
+        int[] parent = new int[n];    // To reconstruct path
+        Arrays.fill(dp, -1);
+        Arrays.fill(parent, -1);
+
+        int maxLen = 0, startIdx = 0;
+        for (int i = 0; i < n; ++i) {
+            int len = dfs(i, graph, dp, parent);
+            if (len > maxLen) {
+                maxLen = len;
+                startIdx = i;
+            }
+        }
+
+        // Step 3: Reconstruct the path
+        List<String> result = new ArrayList<>();
+        while (startIdx != -1) {
+            result.add(words[startIdx]);
+            startIdx = parent[startIdx];
+        }
+        return result;
+    }
+
+    private int dfs(int node, List<List<Integer>> graph, int[] dp, int[] parent) {
+        if (dp[node] != -1) return dp[node];
+
+        int maxLen = 1;
+        for (int nei : graph.get(node)) {
+            int len = 1 + dfs(nei, graph, dp, parent);
+            if (len > maxLen) {
+                maxLen = len;
+                parent[node] = nei;
+            }
+        }
+        dp[node] = maxLen;
+        return maxLen;
+    }
+
+    private int hammingDistance(String a, String b) {
+        int dist = 0;
+        for (int i = 0; i < a.length(); ++i) {
+            if (a.charAt(i) != b.charAt(i)) dist++;
+        }
+        return dist;
+    }
+}
