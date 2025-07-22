@@ -1,0 +1,35 @@
+class TreeNode {
+    int val;
+    TreeNode left, right;
+    TreeNode(int x) { val = x; }
+}
+
+class Solution {
+    int preIndex = 0;
+
+    public TreeNode constructFromPrePost(int[] preorder, int[] postorder) {
+        return build(preorder, postorder, 0, postorder.length - 1);
+    }
+
+    private TreeNode build(int[] preorder, int[] postorder, int postStart, int postEnd) {
+        if (preIndex >= preorder.length || postStart > postEnd)
+            return null;
+
+        TreeNode root = new TreeNode(preorder[preIndex++]);
+
+        if (postStart == postEnd || preIndex >= preorder.length)
+            return root;
+
+        // Find next preorder element in postorder to determine left subtree size
+        int index = postStart;
+        while (postorder[index] != preorder[preIndex]) {
+            index++;
+        }
+
+        // Build left and right subtrees
+        root.left = build(preorder, postorder, postStart, index);
+        root.right = build(preorder, postorder, index + 1, postEnd - 1);
+
+        return root;
+    }
+}
