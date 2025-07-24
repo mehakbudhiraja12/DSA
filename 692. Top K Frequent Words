@@ -1,0 +1,40 @@
+import java.util.*;
+
+public class Solution {
+    public List<String> topKFrequent(String[] words, int k) {
+        Map<String, Integer> freqMap = new HashMap<>();
+        
+        // Step 1: Count frequency
+        for (String word : words) {
+            freqMap.put(word, freqMap.getOrDefault(word, 0) + 1);
+        }
+
+        // Step 2: Use a min heap with custom comparator
+        PriorityQueue<String> heap = new PriorityQueue<>(
+            (a, b) -> {
+                int freqCompare = freqMap.get(a) - freqMap.get(b);
+                if (freqCompare == 0) {
+                    return b.compareTo(a); // reverse lexicographical for minHeap
+                }
+                return freqCompare;
+            });
+
+        // Step 3: Keep top k in the heap
+        for (String word : freqMap.keySet()) {
+            heap.offer(word);
+            if (heap.size() > k) {
+                heap.poll(); // remove least frequent
+            }
+        }
+
+        // Step 4: Pop elements from heap to result list
+        List<String> result = new ArrayList<>();
+        while (!heap.isEmpty()) {
+            result.add(heap.poll());
+        }
+
+        // Since it's a min heap, reverse to get most frequent first
+        Collections.reverse(result);
+        return result;
+    }
+}
